@@ -1,0 +1,32 @@
+spring:
+    application:
+        name: documents-storaging-sepolia
+    datasource:
+        url: ${SPRING_DATASOURCE_URL}
+        username: ${SPRING_DATASOURCE_USERNAME}
+        password: ${SPRING_DATASOURCE_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+minio:
+    url: ${MINIO_ENDPOINT}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket: documents
+
+eth:
+    rpc-url: ${RPC_URL}
+    private-key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    chain-id: "31337"
+
+contract:
+    address: 0xCONTRACT_ADDRESS
+
+encryption:
+    key: vuG89uGg9DPLrBA+iWjZYFjL+R3JItAS3y7muvguZhM=

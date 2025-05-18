@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: edo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: edo
+      POSTGRES_USER: edo_user
+      POSTGRES_PASSWORD: edo_pass
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - edo_net
+    ports:
+      - "5432:5432"
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    networks:
+      - edo_net
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - minio
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/edo
+      SPRING_DATASOURCE_USERNAME: edo_user
+      SPRING_DATASOURCE_PASSWORD: edo_pass
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      RPC_URL: http://127.0.0.1:8545
+    networks:
+      - edo_net
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./anvil-data:/root/.foundry
+
+networks:
+  edo_net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  minio-data:
