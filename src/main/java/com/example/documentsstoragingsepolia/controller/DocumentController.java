@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @RestController
@@ -31,8 +33,11 @@ public class DocumentController {
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> download(@PathVariable UUID id) throws Exception {
         DocumentDownload dto = documentService.downloadDocument(id);
+        String filename = dto.name();
+        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dto.name())
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"download.pdf\"; filename*=UTF-8''" + encodedFilename)
                 .contentType(MediaType.parseMediaType(dto.contentType()))
                 .body(dto.content());
     }
